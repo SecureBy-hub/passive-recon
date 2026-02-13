@@ -16,13 +16,9 @@ An interactive web-based learning module that explains **Passive Reconnaissance 
 - Tailwind CSS  
 - JavaScript  
 
-## ▶️ Getting Started
-1. Clone or download the repository  
-2. Open `Passive Footprinting.html` in your browser  
-3. (Optional) Deploy live using GitHub Pages or Netlify  
 
 ## 🌐 Live Demo
-> Add your live URL here (GitHub Pages / Netlify)
+> https://secureby-hub.github.io/passive-recon/
 
 ## ⚠️ Ethical Use
 This project is created for **learning and authorized lab environments only**.  
