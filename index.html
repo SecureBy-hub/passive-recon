@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passive Reconnaissance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark gray/black */
+            color: #d1d5db; /* Light gray text */
+        }
+        .terminal-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .terminal-window {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+        }
+        .terminal-header {
+            background-color: #2d2d2d;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+        }
+        .bg-cyber-green {
+            background-color: #22c55e;
+            color: black;
+        }
+        .bg-cyber-dark {
+            background-color: #374151;
+            color: white;
+            border: 1px solid #4b5563;
+        }
+        .bg-cyber-dark:hover {
+            background-color: #4b5563;
+        }
+        .text-cyber-green {
+            color: #4ade80;
+        }
+        .quiz-box {
+            background-color: #1f2937;
+            border-left: 4px solid #4ade80;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #374151;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+            color: #e5e7eb;
+        }
+        .correct-anim {
+            animation: pulse-green 0.5s ease-in-out;
+        }
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen">
+
+    <!-- Navigation / Header -->
+    <header class="bg-gray-900 border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white tracking-wider"><i class="fas fa-user-secret mr-2 text-cyber-green"></i> Passive Reconnaissance</h1>
+            <span class="text-sm text-gray-400">Network Fundamentals</span>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-10 space-y-12">
+
+        <!-- Introduction Section -->
+        <section class="space-y-6">
+            <h1 class="text-4xl font-extrabold text-white">Passive Reconnaissance</h1>
+            
+            <p class="text-lg leading-relaxed">
+                In this module covering passive reconnaissance and active reconnaissance, we focus on essential tools related to 
+                <span class="text-cyber-green font-bold">passive reconnaissance</span>. We will learn three command-line tools:
+            </p>
+
+            <ul class="list-none space-y-3 ml-4">
+                <li class="flex items-center"><i class="fas fa-terminal text-gray-500 mr-3"></i> <span><code>whois</code> to query WHOIS servers</span></li>
+                <li class="flex items-center"><i class="fas fa-terminal text-gray-500 mr-3"></i> <span><code>nslookup</code> to query DNS servers</span></li>
+                <li class="flex items-center"><i class="fas fa-terminal text-gray-500 mr-3"></i> <span><code>dig</code> to query DNS servers</span></li>
+            </ul>
+
+            <p class="leading-relaxed">
+                We use <code>whois</code> to query WHOIS records, while we use <code>nslookup</code> and <code>dig</code> to query DNS database records. These are all publicly available records and hence do not alert the target.
+            </p>
+
+            <div class="bg-blue-900/30 border border-blue-800 p-4 rounded-lg">
+                <h3 class="font-bold text-blue-400 mb-2">Pre-requisites</h3>
+                <p class="text-sm">This room requires basic networking knowledge along with basic familiarity with the command line. The modules <strong>Network Fundamentals</strong> and <strong>Linux Fundamentals</strong> provide the required knowledge if necessary.</p>
+                <p class="text-sm mt-2">It expects the user to have a working knowledge of computer networks. If you would like to brush up on this topic, you are encouraged to study the Network Fundamentals module first.</p>
+            </div>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- The Art of War / Philosophy -->
+        <section class="space-y-6">
+            <blockquote class="border-l-4 border-yellow-500 pl-4 italic text-gray-300 bg-gray-800/50 p-4 rounded-r-lg">
+                "If you know the enemy and know yourself, your victory will not stand in doubt."
+                <footer class="mt-2 text-sm text-gray-500">— Sun Tzu, The Art of War</footer>
+            </blockquote>
+
+            <p class="leading-relaxed">
+                Before the dawn of computer systems and networks, in The Art of War, Sun Tzu taught the above. If you are playing the role of an attacker, you need to gather information about your target systems. If you are playing the role of a defender, you need to know what your adversary will discover about your systems and networks.
+            </p>
+
+            <p>
+                Reconnaissance (recon) can be defined as a preliminary survey to gather information about a target. It is the first step in The Unified Kill Chain to gain an initial foothold on a system. We divide reconnaissance into:
+            </p>
+            <ol class="list-decimal list-inside space-y-2 ml-4 text-cyber-green font-semibold">
+                <li>Passive Reconnaissance</li>
+                <li>Active Reconnaissance</li>
+            </ol>
+        </section>
+
+        <!-- Passive vs Active Details -->
+        <section class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <h2 class="text-2xl font-bold text-white"><i class="fas fa-binoculars mr-2"></i> Passive Reconnaissance</h2>
+                <p>
+                    In passive reconnaissance, you rely on publicly available knowledge. It is the knowledge that you can access from publicly available resources without directly engaging with the target. Think of it like you are looking at target territory from afar without stepping foot on that territory.
+                </p>
+                <p class="text-sm text-gray-400">Passive reconnaissance activities include many activities, for instance:</p>
+                <ul class="list-disc list-inside text-gray-400 text-sm space-y-1">
+                    <li>Looking up DNS records of a domain from a public DNS server.</li>
+                    <li>Checking job ads related to the target website.</li>
+                    <li>Reading news articles about the target company.</li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-2xl font-bold text-white"><i class="fas fa-bolt mr-2"></i> Active Reconnaissance</h2>
+                <p>
+                    Active reconnaissance, on the other hand, cannot be achieved so discreetly. It requires direct engagement with the target. Think of it like checking the locks on the doors and windows, among other potential entry points.
+                </p>
+                <p class="text-sm text-gray-400">Examples of active reconnaissance activities include:</p>
+                <ul class="list-disc list-inside text-gray-400 text-sm space-y-1">
+                    <li>Connecting to one of the company servers such as HTTP, FTP, and SMTP.</li>
+                    <li>Calling the company in an attempt to get information (social engineering).</li>
+                    <li>Entering company premises pretending to be a repairman.</li>
+                </ul>
+                <div class="bg-red-900/20 border border-red-800 p-3 rounded text-xs text-red-300 mt-2">
+                    <i class="fas fa-exclamation-triangle mr-1"></i> Considering the invasive nature of active reconnaissance, one can quickly get into legal trouble unless one obtains proper legal authorisation.
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz 1 -->
+        <section class="quiz-box">
+            <h3 class="text-xl font-bold text-white mb-4">Answer the questions below</h3>
+            
+            <div class="space-y-6">
+                <!-- Q1 -->
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">You visit the Facebook page of the target company, hoping to get some of their employee names. What kind of reconnaissance activity is this? (A for active, P for passive)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q1-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="Answer here...">
+                        <button onclick="checkAnswer('q1-input', 'q1-btn', 'P')" id="q1-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">You ping the IP address of the company webserver to check if ICMP traffic is blocked. What kind of reconnaissance activity is this? (A for active, P for passive)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q2-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="Answer here...">
+                        <button onclick="checkAnswer('q2-input', 'q2-btn', 'A')" id="q2-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">You happen to meet the IT administrator of the target company at a party. You try to use social engineering to get more information about their systems and network infrastructure. What kind of reconnaissance activity is this? (A for active, P for passive)</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q3-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="Answer here...">
+                        <button onclick="checkAnswer('q3-input', 'q3-btn', 'A')" id="q3-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- WHOIS Section -->
+        <section class="space-y-6">
+            <h2 class="text-3xl font-bold text-white">WHOIS</h2>
+            <p>
+                WHOIS is a request and response protocol that follows the RFC 3912 specification. A WHOIS server listens on <strong>TCP port 43</strong> for incoming requests. The domain registrar is responsible for maintaining the WHOIS records for the domain names it is leasing. The WHOIS server replies with various information related to the domain requested.
+            </p>
+            <p>Of particular interest, we can learn:</p>
+            <ul class="list-disc list-inside ml-4 space-y-1 text-gray-300">
+                <li><strong>Registrar:</strong> Via which registrar was the domain name registered?</li>
+                <li><strong>Contact info of registrant:</strong> Name, organization, address, phone, among other things (unless made hidden via a privacy service).</li>
+                <li><strong>Creation, update, and expiration dates:</strong> When was the domain name first registered? When was it last updated? And when does it need to be renewed?</li>
+                <li><strong>Name Server:</strong> Which server to ask to resolve the domain name?</li>
+            </ul>
+
+            <p>
+                To get this information, we need to use a whois client or an online service. Many online services provide whois information; however, it is generally faster and more convenient to use your local whois client. Using the AttackBox (or your local Linux machine, such as Parrot or Kali), you can easily access your whois client on the terminal.
+            </p>
+
+            <div class="bg-gray-800 p-3 rounded terminal-font text-sm mb-4">
+                The syntax is: <code>whois DOMAIN_NAME</code>
+            </div>
+            
+            <p>where <code>DOMAIN_NAME</code> is the domain about which you are trying to get more information.</p>
+
+            <h3 class="text-xl font-bold text-white mt-6">Example Output</h3>
+            <div class="terminal-window">
+                <div class="terminal-header">
+                    <div class="dot bg-red-500"></div>
+                    <div class="dot bg-yellow-500"></div>
+                    <div class="dot bg-green-500"></div>
+                    <span class="ml-2 text-xs text-gray-400">Terminal</span>
+                </div>
+                <div class="p-4 bg-gray-900 bg-opacity-95 text-xs sm:text-sm text-gray-300 terminal-font overflow-x-auto">
+<pre>
+<span class="text-green-400">user@TryHackMe$</span> whois tryhackme.com
+[Querying whois.verisign-grs.com]
+[Redirected to whois.namecheap.com]
+[Querying whois.namecheap.com]
+[whois.namecheap.com]
+Domain name: tryhackme.com
+Registry Domain ID: 2282723194_DOMAIN_COM-VRSN
+Registrar WHOIS Server: whois.namecheap.com
+Registrar URL: http://www.namecheap.com
+Updated Date: 2021-05-01T19:43:23.31Z
+Creation Date: 2018-07-05T19:46:15.00Z
+Registrar Registration Expiration Date: 2027-07-05T19:46:15.00Z
+Registrar: NAMECHEAP INC
+Registrar IANA ID: 1068
+Registrar Abuse Contact Email: abuse@namecheap.com
+Registrar Abuse Contact Phone: +1.6613102107
+Reseller: NAMECHEAP INC
+Domain Status: clientTransferProhibited https://icann.org/epp#clientTransferProhibited
+Registry Registrant ID:
+Registrant Name: Withheld for Privacy Purposes
+Registrant Organization: Privacy service provided by Withheld for Privacy ehf
+[...]
+URL of the ICANN WHOIS Data Problem Reporting System: http://wdprs.internic.net/
+>>> Last update of WHOIS database: 2021-08-25T14:58:29.572 <<<
+For more information on Whois status codes, please visit https://icann.org/epp
+</pre>
+                </div>
+            </div>
+
+            <p class="text-gray-300">
+                We can see plenty of information; we will inspect them in the order displayed. First, we notice that we were redirected to <code>whois.namecheap.com</code> to get our information. In this case and at the time being, <code>namecheap.com</code> is maintaining the WHOIS record for this domain name. Furthermore, we can see the creation date along with the last-update date and expiration date.
+            </p>
+            <p class="text-gray-300">
+                Next, we obtain information about the registrar and the registrant. We can find the registrant's name and contact information unless they are using some privacy service. Although not displayed above, we get the admin and tech contacts for this domain. Finally, we see the domain name servers that we should query if we have any DNS records to look up.
+            </p>
+            
+            <div class="bg-gray-800/50 p-4 rounded border-l-4 border-yellow-500">
+                <p class="text-gray-200">
+                    The information collected can be inspected to find new attack surfaces, such as social engineering or technical attacks. For instance, depending on the scope of the penetration test, you might consider an attack against the email server of the admin user or the DNS servers, assuming they are owned by your client and fall within the scope of the penetration test.
+                </p>
+            </div>
+
+            <p class="text-sm text-gray-400">
+                It is important to note that due to automated tools abusing WHOIS queries to harvest email addresses, many WHOIS services take measures against this. They might redact email addresses, for instance. Moreover, many registrants subscribe to privacy services to avoid their email addresses being harvested by spammers and keep their information private.
+            </p>
+        </section>
+
+        <!-- Quiz 2 -->
+        <section class="quiz-box">
+            <h3 class="text-xl font-bold text-white mb-4">Answer the questions below</h3>
+            <p class="text-sm text-gray-400 mb-4">On the AttackBox, open the terminal and run the <code>whois tryhackme.com</code> command to get the information you need to answer the following questions.</p>
+            
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">When was TryHackMe.com registered?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q4-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="YYYYMMDD">
+                        <button onclick="checkAnswer('q4-input', 'q4-btn', '20180705')" id="q4-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">What is the registrar of TryHackMe.com?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q5-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="e.g. GoDaddy">
+                        <button onclick="checkAnswer('q5-input', 'q5-btn', 'NAMECHEAP INC')" id="q5-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">Which company is TryHackMe.com using for name servers?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q6-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="e.g. AWS">
+                        <button onclick="checkAnswer('q6-input', 'q6-btn', 'Cloudflare')" id="q6-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- nslookup Section -->
+        <section class="space-y-6">
+            <h2 class="text-3xl font-bold text-white">nslookup</h2>
+            <p>
+                In the previous task, we used the WHOIS protocol to get various information about the domain name we were looking up. In particular, we were able to get the DNS servers from the registrar.
+            </p>
+            <p>
+                Find the IP address of a domain name using <code>nslookup</code>, which stands for Name Server Look Up. You need to issue the command <code>nslookup DOMAIN_NAME</code>, for example, <code>nslookup tryhackme.com</code>. Or, more generally, you can use:
+            </p>
+            
+            <div class="bg-gray-800 p-3 rounded terminal-font text-sm">nslookup [OPTIONS] DOMAIN_NAME [SERVER]</div>
+
+            <p class="font-bold mt-4">These three main parameters are:</p>
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li><strong>OPTIONS:</strong> contains the query type as shown in the table below. For instance, you can use <code>A</code> for IPv4 addresses and <code>AAAA</code> for IPv6 addresses.</li>
+                <li><strong>DOMAIN_NAME:</strong> is the domain name you are looking up.</li>
+                <li><strong>SERVER:</strong> is the DNS server that you want to query. You can choose any local or public DNS server to query. Cloudflare offers <code>1.1.1.1</code> and <code>1.0.0.1</code>, Google offers <code>8.8.8.8</code> and <code>8.8.4.4</code>, and Quad9 offers <code>9.9.9.9</code> and <code>149.112.112.112</code>. There are many more public DNS servers that you can choose from if you want alternatives to your ISP's DNS servers.</li>
+            </ul>
+
+            <!-- Table -->
+            <div class="overflow-x-auto mt-6">
+                <table class="w-full text-left border-collapse rounded-lg overflow-hidden">
+                    <thead>
+                        <tr class="bg-gray-800 text-cyber-green">
+                            <th class="p-3">Query Type</th>
+                            <th class="p-3">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700 bg-gray-900">
+                        <tr><td class="p-3">A</td><td class="p-3">IPv4 Addresses</td></tr>
+                        <tr><td class="p-3">AAAA</td><td class="p-3">IPv6 Addresses</td></tr>
+                        <tr><td class="p-3">CNAME</td><td class="p-3">Canonical Name</td></tr>
+                        <tr><td class="p-3">MX</td><td class="p-3">Mail Servers</td></tr>
+                        <tr><td class="p-3">SOA</td><td class="p-3">Start of Authority</td></tr>
+                        <tr><td class="p-3">TXT</td><td class="p-3">TXT Records</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- nslookup examples -->
+            <h3 class="text-xl font-bold text-white mt-6">Example: A Record Lookup</h3>
+            <p class="text-gray-300">
+                For instance, <code>nslookup -type=A tryhackme.com 1.1.1.1</code> (or <code>nslookup -type=a tryhackme.com 1.1.1.1</code> as it is case-insensitive) can be used to return all the IPv4 addresses used by tryhackme.com.
+            </p>
+            <div class="terminal-window">
+                <div class="terminal-header"><span class="ml-2 text-xs text-gray-400">Terminal</span></div>
+                <div class="p-4 bg-gray-900 bg-opacity-95 text-xs sm:text-sm text-gray-300 terminal-font">
+<pre>
+<span class="text-green-400">user@TryHackMe$</span> nslookup -type=A tryhackme.com 1.1.1.1
+Server:     1.1.1.1
+Address:    1.1.1.1#53
+
+Non-authoritative answer:
+Name:       tryhackme.com
+Address:    172.67.69.208
+Name:       tryhackme.com
+Address:    104.26.11.229
+Name:       tryhackme.com
+Address:    104.26.10.229
+</pre>
+                </div>
+            </div>
+
+            <p>
+                The A and AAAA records are used to return IPv4 and IPv6 addresses, respectively. This lookup is helpful to know from a penetration testing perspective. In the example above, we started with one domain name, and we obtained three IPv4 addresses. Each of these IP addresses can be further checked for insecurities, assuming they lie within the scope of the penetration test.
+            </p>
+
+            <h3 class="text-xl font-bold text-white mt-6">Example: Mail Exchange (MX) Lookup</h3>
+            <p>
+                Let's say you want to learn about the email servers and configurations for a particular domain. You can issue <code>nslookup -type=MX tryhackme.com</code>. Here is an example:
+            </p>
+            <div class="terminal-window">
+                <div class="terminal-header"><span class="ml-2 text-xs text-gray-400">Terminal</span></div>
+                <div class="p-4 bg-gray-900 bg-opacity-95 text-xs sm:text-sm text-gray-300 terminal-font">
+<pre>
+<span class="text-green-400">user@TryHackMe$</span> nslookup -type=MX tryhackme.com
+Server:     127.0.0.53
+Address:    127.0.0.53#53
+
+Non-authoritative answer:
+tryhackme.com   mail exchanger = 5 alt1.aspmx.l.google.com.
+tryhackme.com   mail exchanger = 1 aspmx.l.google.com.
+tryhackme.com   mail exchanger = 10 alt4.aspmx.l.google.com.
+tryhackme.com   mail exchanger = 10 alt3.aspmx.l.google.com.
+tryhackme.com   mail exchanger = 5 alt2.aspmx.l.google.com.
+</pre>
+                </div>
+            </div>
+            
+            <p class="text-gray-300">
+                We can see that tryhackme.com's current email configuration uses Google. Since MX is looking up the Mail Exchange servers, we notice that when a mail server tries to deliver email @tryhackme.com, it will try to connect to the <code>aspmx.l.google.com</code>, which has order 1. If it is busy or unavailable, the mail server will attempt to connect to the next in order mail exchange servers, <code>alt1.aspmx.l.google.com</code> or <code>alt2.aspmx.l.google.com</code>.
+            </p>
+            <p class="text-gray-300">
+                Google provides the listed mail servers; therefore, we should not expect the mail servers to be running a vulnerable server version. However, in other cases, we might find mail servers that are not adequately secured or patched.
+            </p>
+            <p class="text-gray-300 italic">
+                Such pieces of information might prove valuable as you continue the passive reconnaissance of your target. You can repeat similar queries for other domain names and try different types, such as <code>-type=txt</code>. Who knows what kind of information you might discover along your way!
+            </p>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- dig Section -->
+        <section class="space-y-6 mb-12">
+            <h2 class="text-3xl font-bold text-white">dig</h2>
+            <p>
+                For more advanced DNS queries and additional functionality, you can use <code>dig</code>, the acronym for "Domain Information Groper," if you are curious. Let's use <code>dig</code> to look up the MX records and compare them to <code>nslookup</code>. 
+            </p>
+            <p>
+                We can use <code>dig DOMAIN_NAME</code>, but to specify the record type, we would use <code>dig DOMAIN_NAME TYPE</code>. Optionally, we can select the server we want to query using <code>dig @SERVER DOMAIN_NAME TYPE</code>.
+            </p>
+
+            <ul class="list-disc list-inside space-y-2 text-gray-300">
+                <li><strong>SERVER:</strong> is the DNS server that you want to query.</li>
+                <li><strong>DOMAIN_NAME:</strong> is the domain name you are looking up.</li>
+                <li><strong>TYPE:</strong> contains the DNS record type, as shown in the table provided earlier.</li>
+            </ul>
+            
+            <div class="terminal-window">
+                <div class="terminal-header"><span class="ml-2 text-xs text-gray-400">Terminal</span></div>
+                <div class="p-4 bg-gray-900 bg-opacity-95 text-xs sm:text-sm text-gray-300 terminal-font">
+<pre>
+<span class="text-green-400">user@TryHackMe$</span> dig tryhackme.com MX
+
+; <<>> DiG 9.16.19-RH <<>> tryhackme.com MX
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 64639
+</pre>
+                </div>
+            </div>
+
+            <p>
+                A quick comparison between the output of <code>nslookup</code> and <code>dig</code> shows that <code>dig</code> returned more information, such as the TTL (Time To Live) by default. If you want to query a 1.1.1.1 DNS server, you can execute:
+            </p>
+            <div class="bg-gray-800 p-2 rounded terminal-font text-sm mb-4">dig @1.1.1.1 tryhackme.com MX</div>
+
+            <p>Using the AttackBox, open the terminal and use the <code>nslookup</code> or <code>dig</code> command to get the information you need.</p>
+        </section>
+
+        <!-- Quiz 3 -->
+        <section class="quiz-box">
+            <h3 class="text-xl font-bold text-white mb-4">Answer the questions below</h3>
+            
+            <div class="space-y-6">
+                <!-- Q1 -->
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">What does nslookup stand for?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q7-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="Answer here...">
+                        <button onclick="checkAnswer('q7-input', 'q7-btn', 'Name Server Look Up')" id="q7-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div>
+                    <label class="block text-sm mb-2 text-gray-300">Which tool provides more information by default, such as the TTL?</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="q8-input" class="bg-gray-700 border border-gray-600 rounded px-3 py-2 text-white w-full max-w-xs focus:outline-none focus:border-green-500 transition-all" placeholder="Command name">
+                        <button onclick="checkAnswer('q8-input', 'q8-btn', 'dig')" id="q8-btn" class="bg-cyber-dark px-4 py-2 rounded font-bold text-sm transition-all hover:bg-gray-600">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="border-gray-800">
+
+        <!-- About Section -->
+        <section class="bg-gray-800/50 p-6 rounded-lg border border-gray-700">
+            <h2 class="text-2xl font-bold text-white mb-4"><i class="fas fa-info-circle mr-2 text-cyber-green"></i> About</h2>
+            <p class="text-gray-300 leading-relaxed">
+                This learning module is designed to introduce the fundamental concepts of <strong>Passive Reconnaissance</strong>. 
+                By mastering tools like <code>whois</code>, <code>nslookup</code>, and <code>dig</code>, security professionals can gather 
+                vital intelligence about a target without triggering security alarms or leaving a digital footprint.
+            </p>
+            <p class="text-gray-300 mt-4">
+                Understanding the distinction between passive and active reconnaissance is crucial for legal compliance and 
+                operational security (OPSEC) during penetration testing engagements.
+            </p>
+
+            <div class="mt-6 bg-yellow-900/20 border border-yellow-700/50 p-4 rounded-lg">
+                <p class="text-yellow-200 text-sm font-semibold flex items-center">
+                    <i class="fas fa-exclamation-triangle mr-3"></i> 
+                    Note: This content is for educational purposes only.
+                </p>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section class="bg-gray-800 border border-gray-700 p-6 rounded-lg mt-8">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center border border-gray-600">
+                    <i class="fas fa-user-ninja text-3xl text-cyber-green"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">About Me</h2>
+                    <p class="text-gray-400 text-sm">Cybersecurity Student & Developer</p>
+                </div>
+            </div>
+            <p class="text-gray-300 mt-4 leading-relaxed">
+                Welcome to my interactive learning notes! I created this page to document my journey into Network Fundamentals and Passive Reconnaissance. My goal is to turn static study materials into interactive, actionable guides for fellow learners in the community.
+            </p>
+            <div class="flex gap-4 mt-6">
+                <a href="https://github.com/SecureBy-hub" target="_blank" class="text-gray-400 hover:text-white transition-colors flex items-center gap-2">
+                    <i class="fab fa-github text-2xl"></i>
+                    <span class="text-sm font-semibold">SecureBy-hub</span>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-twitter text-2xl"></i></a>
+                <a href="#" class="text-gray-400 hover:text-white transition-colors"><i class="fab fa-linkedin text-2xl"></i></a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 border-t border-gray-800 py-6 text-center text-sm text-gray-500">
+        <p>Reference Material: TryHackMe - Passive Reconnaissance</p>
+    </footer>
+
+    <script>
+        function checkAnswer(inputId, btnId, correctValue) {
+            const input = document.getElementById(inputId);
+            const btn = document.getElementById(btnId);
+            const userValue = input.value.trim();
+
+            // Check if input matches or starts with correctValue (for the flag)
+            let isCorrect = false;
+            
+            if (correctValue === 'THM{') {
+                // Special handling for flag: just check format
+                if (userValue.startsWith('THM{') && userValue.endsWith('}')) {
+                    isCorrect = true;
+                }
+            } else {
+                if (userValue.toLowerCase() === correctValue.toLowerCase()) {
+                    isCorrect = true;
+                }
+            }
+
+            if (isCorrect) {
+                // Success state
+                btn.classList.remove('bg-cyber-dark', 'hover:bg-gray-600', 'bg-red-500', 'hover:bg-red-600');
+                btn.classList.add('bg-cyber-green', 'text-black', 'hover:bg-green-500', 'correct-anim');
+                btn.innerHTML = 'Correct Answer';
+                input.classList.remove('border-red-500');
+                input.classList.add('border-green-500');
+                input.disabled = true;
+            } else {
+                // Error state
+                btn.classList.remove('bg-cyber-dark', 'hover:bg-gray-600');
+                btn.classList.add('bg-red-500', 'hover:bg-red-600', 'text-white');
+                btn.innerHTML = 'Try Again';
+                input.classList.add('border-red-500');
+                
+                // Reset after 2 seconds
+                setTimeout(() => {
+                    btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    btn.classList.add('bg-cyber-dark', 'hover:bg-gray-600');
+                    btn.innerHTML = 'Submit';
+                }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
