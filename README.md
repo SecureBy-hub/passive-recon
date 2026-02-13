@@ -17,7 +17,7 @@ An interactive web-based learning module that explains **Passive Reconnaissance 
 - JavaScript  
 
 
-## 🌐 Live Demo
+## 🌐 For walkthrough click on link
 > https://secureby-hub.github.io/passive-recon/
 
 ## ⚠️ Ethical Use
