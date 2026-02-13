@@ -38,6 +38,6 @@ Do not perform reconnaissance on real-world targets without explicit permission.
 Pratik Ingale  
 Cybersecurity Student | Ethical Hacking Learner  
 
-## 📝 License
+
 Academic & educational use only.
 
